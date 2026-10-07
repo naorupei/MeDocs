@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Medocs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0a0a0a;--paper:#fff;--blue:#1f3bff;--tint:#e4e8ff;--shadow:6px 6px 0 var(--ink)}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{font:500 15.5px/1.5 "Archivo","Arial Narrow",Arial,sans-serif;background:var(--blue);color:var(--ink);display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0px)}
+::selection{background:var(--ink);color:var(--paper)}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+h1,h2,h3{margin:0;font-stretch:125%;font-weight:900;line-height:1}
+
+header{display:flex;align-items:center;gap:16px;padding:18px 24px 14px;padding-top:calc(18px + env(safe-area-inset-top,0px))}
+.word{font-size:clamp(34px,5vw,54px);color:var(--paper);text-shadow:4px 4px 0 var(--ink);letter-spacing:-.02em}
+.sticker{background:var(--paper);border:3px solid var(--ink);padding:3px 12px;font-weight:800;font-stretch:125%;transform:rotate(-4deg);box-shadow:3px 3px 0 var(--ink)}
+.sp{flex:1}
+.btn{border:3px solid var(--ink);background:var(--paper);padding:7px 16px;font-weight:800;box-shadow:4px 4px 0 var(--ink);transition:transform .08s,box-shadow .08s}
+.btn:hover{background:var(--tint)}
+.btn:active{transform:translate(4px,4px);box-shadow:0 0 0 var(--ink)}
+.btn.go{background:var(--ink);color:var(--paper)}
+.btn.go:hover{background:var(--blue)}
+.btn:disabled{opacity:.35;cursor:default;box-shadow:4px 4px 0 var(--ink)}
+.btn:disabled:active{transform:none}
+
+.tabs{display:none}
+.wrap{flex:1;display:grid;grid-template-columns:340px minmax(0,1fr);gap:26px;padding:6px 24px 26px;min-height:0}
+.panel{background:var(--paper);border:3px solid var(--ink);box-shadow:var(--shadow);display:flex;flex-direction:column;min-height:0}
+.ph{display:flex;align-items:baseline;gap:10px;padding:14px 18px;border-bottom:3px solid var(--ink)}
+.ph h2{font-size:24px}
+.ph small{color:var(--blue);font-weight:800}
+.pb{flex:1;overflow:auto;padding:16px 18px}
+
+/* sources */
+.add{display:block;text-align:center;cursor:pointer}
+.src{display:flex;align-items:center;gap:10px;border:3px solid var(--ink);padding:8px 10px;margin-top:12px;background:var(--paper);box-shadow:4px 4px 0 var(--ink);transition:transform .08s,box-shadow .08s}
+.src.off{background:var(--tint);box-shadow:none;transform:translate(4px,4px)}
+.src.hl{background:var(--blue);color:var(--paper)}
+.num{background:var(--blue);color:var(--paper);min-width:26px;height:26px;display:grid;place-items:center;font-weight:900;flex-shrink:0}
+.src .n{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700}
+.x{border:0;background:none;font-weight:900;padding:2px 6px}
+.x:hover{background:var(--ink);color:var(--paper)}
+input[type=checkbox]{appearance:none;width:22px;height:22px;border:3px solid var(--ink);background:var(--paper);margin:0;flex-shrink:0;cursor:pointer}
+input[type=checkbox]:checked{background:var(--blue);box-shadow:inset 0 0 0 3px var(--paper)}
+.all{display:none;align-items:center;gap:10px;margin-top:14px;font-weight:800}
+.all span{flex:1}
+.empty{border:3px dashed var(--ink);padding:22px 16px;margin-top:16px;text-align:center}
+.empty b{display:block;font-stretch:125%;font-weight:900;font-size:19px;margin-bottom:6px;transform:rotate(-2deg)}
+.set{display:none;border-top:3px solid var(--ink);padding:14px 18px;gap:10px;flex-direction:column;background:var(--tint)}
+.set.open{display:flex}
+.set input[type=text]{width:100%;border:3px solid var(--ink);padding:6px 10px;background:var(--paper)}
+.set label{font-weight:700}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.dot{width:14px;height:14px;border:3px solid var(--ink);background:var(--paper)}
+.dot.ok{background:var(--blue)}.dot.bad{background:var(--ink)}
+.set .btn{padding:4px 12px;box-shadow:3px 3px 0 var(--ink)}
+
+/* chat */
+.guide{background:var(--blue);color:var(--paper);border:3px solid var(--ink);box-shadow:5px 5px 0 var(--ink);padding:18px;margin:2px 5px 22px 0}
+.guide h2{font-size:26px;margin-bottom:10px}
+.guide p{margin:0 0 14px;max-width:62ch}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip{border:3px solid var(--ink);background:var(--paper);color:var(--ink);padding:5px 12px;font-weight:700;text-align:left;box-shadow:3px 3px 0 var(--ink);transition:transform .08s,box-shadow .08s}
+.chip:hover{background:var(--tint)}
+.chip:active{transform:translate(3px,3px);box-shadow:none}
+.msg{margin:18px 5px 18px 0;max-width:min(680px,92%)}
+.msg .t{white-space:pre-wrap;overflow-wrap:anywhere;padding:10px 14px;border:3px solid var(--ink)}
+.msg.u{margin-left:auto}
+.msg.u .t{background:var(--ink);color:var(--paper)}
+.msg.a .t{background:var(--paper);box-shadow:5px 5px 0 var(--blue)}
+.cite{display:inline-grid;place-items:center;min-width:22px;height:22px;background:var(--blue);color:var(--paper);border:0;font-weight:900;font-size:12px;margin-left:4px;padding:0 5px;vertical-align:1px}
+.cite:hover{background:var(--ink)}
+.typing{display:inline-flex;gap:5px}
+.typing i{width:10px;height:10px;background:var(--blue);animation:bl 1s steps(2) infinite}
+.typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
+@keyframes bl{50%{background:var(--ink)}}
+@media(prefers-reduced-motion:reduce){.typing i{animation:none}.btn,.src,.chip{transition:none}}
+form{display:flex;gap:14px;align-items:flex-end;padding:14px 18px;border-top:3px solid var(--ink)}
+textarea{flex:1;border:3px solid var(--ink);resize:none;max-height:140px;padding:9px 12px;background:var(--paper);outline:none}
+textarea:focus{box-shadow:4px 4px 0 var(--blue)}
+textarea:disabled{background:var(--tint)}
+.foot{padding:0 18px 12px;font-size:13px;font-weight:600}
+
+@media(max-width:900px){
+ header{padding:14px 16px 10px}
+ .tabs{display:flex;gap:12px;padding:6px 16px 16px}.tabs .btn{flex:1}
+ .tabs .btn.on{background:var(--ink);color:var(--paper)}
+ .wrap{grid-template-columns:1fr;padding:0 16px 20px}.panel{display:none}
+ body[data-tab=s] #p-s,body[data-tab=c] #p-c{display:flex}
+ .sticker{display:none}
+}
+</style>
+</head>
+<body data-tab="c">
+
+<header>
+  <h1 class="word">Medocs</h1>
+  <span class="sticker" id="mode">Demo mode</span>
+  <span class="sp"></span>
+  <button class="btn" id="gear" aria-expanded="false">Settings</button>
+</header>
+<nav class="tabs" aria-label="Panels">
+  <button class="btn" data-t="s">Sources</button>
+  <button class="btn on" data-t="c">Chat</button>
+</nav>
+
+<div class="wrap">
+  <section class="panel" id="p-s" aria-label="Sources">
+    <div class="ph"><h2>Sources</h2><small id="count"></small></div>
+    <div class="pb">
+      <label class="btn add">+ Add a report
+        <input id="file" type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.txt" hidden>
+      </label>
+      <label class="all" id="allRow"><span>Use all</span><input type="checkbox" id="all" checked></label>
+      <div id="srcList"></div>
+    </div>
+    <div class="set" id="set">
+      <label>API base URL<input id="api" type="text" value="http://localhost:8000"></label>
+      <label class="row"><input id="mock" type="checkbox" checked> Use mock data</label>
+      <div class="row"><span class="dot" id="hd"></span><span id="ht">Not checked</span></div>
+      <div class="row"><button class="btn" id="hb">Check health</button><button class="btn" id="rs">Reset all</button></div>
+    </div>
+  </section>
+
+  <section class="panel" id="p-c" aria-label="Chat">
+    <div class="ph"><h2>Chat</h2></div>
+    <div class="pb" id="chat" aria-live="polite"></div>
+    <form id="form">
+      <textarea id="q" rows="1" aria-label="Ask about your sources"></textarea>
+      <button class="btn go" id="send" type="submit" disabled>Send</button>
+    </form>
+    <div class="foot">Medocs explains your documents. It is not a doctor and does not replace medical advice.</div>
+  </section>
+</div>
+
+<script>
+const $=id=>document.getElementById(id),esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let sources=[],msgs=[],busy=false,nid=1;
+const mock=()=>$("mock").checked,base=()=>$("api").value.replace(/\/$/,""),on=()=>sources.filter(s=>s.on);
+
+/* demo data */
+const DEMO=[
+ {tests:[["HbA1c","6.1 %","< 5.7 %",1],["LDL cholesterol","3.4 mmol/L","< 3.0",1],["Haemoglobin","13.5 g/dL","12 to 16",0]],meds:["Metformin 500 mg, twice daily","Atorvastatin 10 mg, nightly"]},
+ {tests:[["HbA1c","5.8 %","< 5.7 %",1],["LDL cholesterol","2.9 mmol/L","< 3.0",0],["Haemoglobin","13.8 g/dL","12 to 16",0]],meds:["Metformin 500 mg, twice daily","Atorvastatin 20 mg, nightly"]}];
+const dem=s=>DEMO[s.idx%DEMO.length],pos=s=>sources.indexOf(s)+1;
+
+/* sources */
+function renderSources(){
+  const l=$("srcList");l.innerHTML="";
+  if(!sources.length)l.innerHTML='<div class="empty"><b>Nothing here yet</b>Add a medical report as a PDF, image or text file.</div>';
+  sources.forEach((s,i)=>{
+    const d=document.createElement("div");d.className="src"+(s.on?"":" off");d.id="src"+s.id;
+    d.innerHTML=`<span class="num">${i+1}</span><span class="n" title="${esc(s.name)}">${esc(s.name)}</span><button class="x" aria-label="Remove ${esc(s.name)}">X</button><input type="checkbox" aria-label="Use ${esc(s.name)}" ${s.on?"checked":""}>`;
+    d.querySelector("input").onchange=e=>{s.on=e.target.checked;sync()};
+    d.querySelector(".x").onclick=()=>{sources.splice(sources.indexOf(s),1);sync()};
+    l.appendChild(d);
+  });
+  $("allRow").style.display=sources.length?"flex":"none";
+  $("all").checked=!!sources.length&&sources.every(s=>s.on);
+  $("count").textContent=sources.length?`${on().length} of ${sources.length} in use`:"";
+}
+$("all").onchange=e=>{sources.forEach(s=>s.on=e.target.checked);sync()};
+$("file").onchange=async e=>{
+  const fs=[...e.target.files];e.target.value="";
+  fs.forEach(f=>sources.push({id:nid++,idx:sources.length,name:f.name,on:true}));
+  if(!mock()&&fs.length){
+    try{const fd=new FormData();fs.forEach(f=>fd.append("files",f));
+      const r=await fetch(base()+"/ingest",{method:"POST",body:fd});if(!r.ok)throw new Error("server returned "+r.status);}
+    catch(err){msgs.push({role:"a",text:"Could not ingest the files: "+err.message+". Check that the server is running and the API URL is right.",cites:[]})}
+  }
+  sync();
+};
+
+/* chat */
+function guide(){
+  if(!sources.length)return '<div class="guide"><h2>Add a report to begin</h2><p>Drop in a medical report on the left. Medocs will explain it in plain language and point to the source for every answer.</p></div>';
+  if(!on().length)return '<div class="guide"><h2>No sources in use</h2><p>Tick at least one source on the left.</p></div>';
+  const qs=["Summarize my reports","What are the important findings?","List the medications","Explain my HbA1c results"];
+  if(on().length>1)qs.push("What changed between my reports?");
+  return `<div class="guide"><h2>Ask away</h2><p>${on().length} source${on().length>1?"s":""} in use. ${mock()?"Demo data: slightly raised HbA1c and LDL cholesterol, two regular medicines.":"Try one of these, or type your own question."}</p><div class="chips">${qs.map(q=>`<button class="chip" data-q="${q}">${q}</button>`).join("")}</div></div>`;
+}
+function renderChat(){
+  const c=$("chat");c.innerHTML=guide();
+  c.querySelectorAll(".chip").forEach(b=>b.onclick=()=>send(b.dataset.q));
+  msgs.forEach(m=>{
+    const d=document.createElement("div");d.className="msg "+m.role;
+    const t=document.createElement("div");t.className="t";
+    if(m.typing)t.innerHTML='<span class="typing"><i></i><i></i><i></i></span>';else t.textContent=m.text;
+    (m.cites||[]).forEach(id=>{const s=sources.find(x=>x.id===id);if(!s)return;
+      const b=document.createElement("button");b.className="cite";b.textContent=pos(s);b.title=s.name;
+      b.onclick=()=>{document.body.dataset.tab="s";const el=$("src"+id);el.classList.add("hl");el.scrollIntoView({block:"nearest"});setTimeout(()=>{el.classList.remove("hl");if(innerWidth<=900)document.body.dataset.tab="c"},1400)};
+      t.appendChild(b)});
+    d.appendChild(t);c.appendChild(d);
+  });
+  c.scrollTop=1e9;
+}
+function mockAnswer(q){
+  const s=on(),l=q.toLowerCase(),cites=s.map(x=>x.id);
+  if(/hba1c|sugar|diabet/.test(l))return[s.map(x=>`Source ${pos(x)}: HbA1c is ${dem(x).tests[0][1]} (target ${dem(x).tests[0][2]}). Above target means blood sugar has run a little high over roughly the last 3 months.`).join("\n"),cites];
+  if(/medic|drug|tablet/.test(l))return[[...new Set(s.flatMap(x=>dem(x).meds))].map(m=>"- "+m).join("\n"),cites];
+  if(/chang|compar/.test(l)){if(s.length<2)return["Use two sources to compare them.",[]];const a=dem(s[0]),b=dem(s[1]);
+    return[a.tests.map((t,i)=>`${t[0]}: ${t[1]} became ${b.tests[i][1]}`).join("\n")+"\nHbA1c and LDL both moved toward the target range.",cites]}
+  if(/finding|result/.test(l))return[s.flatMap(x=>dem(x).tests.filter(t=>t[3]).map(t=>`- ${t[0]}: ${t[1]} (target ${t[2]}) is outside range in source ${pos(x)}`)).join("\n"),cites];
+  return["Your reports cover blood sugar, cholesterol and haemoglobin. HbA1c and LDL are slightly above target and haemoglobin is normal. Two regular medicines are listed. Talk to your doctor before changing anything.",cites];
+}
+async function ask(q){
+  if(mock()){await new Promise(r=>setTimeout(r,800));return mockAnswer(q)}
+  const r=await fetch(base()+"/ask",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question:q})});
+  if(!r.ok)throw new Error("server returned "+r.status);
+  const d=await r.json();return[d.answer??d.response??JSON.stringify(d),on().map(x=>x.id)];
+}
+async function send(text){
+  text=text.trim();if(!text||busy||!on().length)return;
+  busy=true;msgs.push({role:"u",text});$("q").value="";$("q").style.height="auto";
+  msgs.push({role:"a",typing:true});sync();
+  let a,c=[];try{[a,c]=await ask(text)}catch(e){a="Something went wrong: "+e.message+"."}
+  msgs.pop();msgs.push({role:"a",text:a,cites:c});busy=false;sync();
+}
+
+function sync(){
+  renderSources();renderChat();
+  const has=on().length>0;
+  $("q").disabled=!has;$("q").placeholder=has?"Ask about your reports":"Add or tick a source first";
+  $("send").disabled=busy||!has||!$("q").value.trim();
+  $("mode").textContent=mock()?"Demo mode":"Live";
+}
+$("form").onsubmit=e=>{e.preventDefault();send($("q").value)};
+$("q").addEventListener("input",e=>{e.target.style.height="auto";e.target.style.height=e.target.scrollHeight+"px";sync()});
+$("q").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();send($("q").value)}});
+$("mock").onchange=sync;
+$("gear").onclick=()=>{const o=$("set").classList.toggle("open");$("gear").setAttribute("aria-expanded",o);if(o)document.body.dataset.tab="s"};
+$("rs").onclick=async()=>{if(!mock()){try{await fetch(base()+"/reset",{method:"POST"})}catch(e){}}sources=[];msgs=[];sync()};
+$("hb").onclick=async()=>{
+  const d=$("hd"),t=$("ht");d.className="dot";t.textContent="Checking";
+  if(mock()){d.classList.add("ok");t.textContent="Mock server OK";return}
+  try{const r=await fetch(base()+"/health");if(!r.ok)throw 0;d.classList.add("ok");t.textContent="Server online"}
+  catch(e){d.classList.add("bad");t.textContent="Server unreachable"}
+};
+document.querySelectorAll(".tabs .btn").forEach(b=>b.onclick=()=>{
+  document.body.dataset.tab=b.dataset.t;
+  document.querySelectorAll(".tabs .btn").forEach(x=>x.classList.toggle("on",x===b));
+});
+sync();
+</script>
+</body>
+</html>
