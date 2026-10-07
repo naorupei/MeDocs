@@ -26,6 +26,16 @@ SECTION_KEYWORDS = {
     "results": "Results",
     "recommendations": "Recommendations",
     "clinical history": "Clinical History",
+    "lipid panel": "Lipid Panel",
+    "follow-up plan": "Follow-up Plan",
+    "follow-up lab results": "Follow-up Lab Results",
+    "doctor's note": "Doctor's Note",
+    "doctor’s note": "Doctor's Note",
+    "what it is used for": "Uses",
+    "dosage for adults": "Dosage",
+    "possible side effects": "Side Effects",
+    "do not use if": "Contraindications",
+    "storage": "Storage",
 }
 
 # Longer keywords first, so "complete blood count" is checked before "cbc"
@@ -38,17 +48,20 @@ def detect_section(line: str) -> Optional[str]:
     """
     If this line looks like a section heading, return the section name.
     Otherwise return None.
-    Examples that match: "Laboratory Results", "MEDICATIONS:", "Diagnosis: Anemia"
+    Handles extra spaces and headings followed by text, like "Dosage: take 1 tablet".
     """
-    line = line.strip()
-    if not line or len(line) > 60:
+    line = " ".join(line.split())  # fixes double spaces from PDFs
+    if not line:
         return None
 
-    candidate = line.split(":")[0].strip().lower()  # text before a colon
+    candidate = line.split(":")[0].strip().lower()  # the part before a colon
+    if len(candidate) > 60:
+        return None
+
     if candidate in SECTION_KEYWORDS:
         return SECTION_KEYWORDS[candidate]
 
-    # allow things like "Complete Blood Count (CBC) Report"
+    # allow things like "Complete Blood Count and Glucose"
     for kw in _LONG_KEYWORDS:
         if candidate.startswith(kw):
             return SECTION_KEYWORDS[kw]
