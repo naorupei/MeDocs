@@ -1,0 +1,13 @@
+# Python / environment
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.env
+
+# Uploaded medical documents and generated metadata - NEVER commit these
+data/documents/*.pdf
+data/metadata/*.json
+
+# Generated synthetic test PDFs (recreate with tests/make_sample_pdf.py)
+tests/sample_*.pdf
